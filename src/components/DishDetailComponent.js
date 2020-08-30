@@ -77,7 +77,7 @@ const DishDetails = (props) => {
         );
     } else {
         return (
-            <h1>Select Dish</h1>
+            <div></div>
         );
     }
 }
