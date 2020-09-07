@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Col, Row, Label, Modal, ModalBody, ModalHeader} from 'reactstrap';
+import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Col, Row, Label, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from "react-redux-form";
+import { Loading } from "./LoadingComponent";
 
 // constructor(props) {
 //     super(props);
@@ -18,51 +19,60 @@ function RenderDish({ dish }) {
             <CardBody>
                 <CardTitle>{dish.name}</CardTitle>
                 <CardText>{dish.description}</CardText>
-                
+
             </CardBody>
         </div>
     );
 }
 
-function RenderComments(dish) {
-    const comments = dish.comments.map((comment) => {
-        return (
-            <React.Fragment>
-                <li> {comment.comment} </li> <br />
-                <li>    <CardText> -- {comment.author}, {formatDate(comment.date)} </CardText></li> <br />
-            </React.Fragment>
-        )
-    });
-
-    if (dish.comments != null) {
+function RenderComments({ comments, addComment, dishId }) {
+    if (comments != null) {
+        const dishcomments = comments.map((comment) => {
+            return (
+                <li key={comment.id} className="list-unstyled">
+                    <p>{comment.comment}</p>
+                    <p>-- {comment.author}, {new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(Date.parse(comment.date)))}</p>
+                </li>
+            )
+        })
         return (
             <div>
                 <h4>Comments</h4>
-                <ul className="list-unstyled">
-                    {comments}
-                </ul>
-                <CommentForm />
+                <div>{dishcomments}</div>
+                <CommentForm dishId={dishId} addComment={addComment} />
             </div>
         );
-    } else {
+    }
+    else {
         return (
             <div></div>
-        )
+        );
     }
 }
 
 
-function formatDate(date) {
-    const option = { year: 'numeric', month: 'short', day: 'numeric' };
-    const date1 = new Date(date)
-    const newdate = date1.toLocaleDateString("en-US", option)
-    return newdate;
-}
 
 
 const DishDetails = (props) => {
     // console.log(props);
-
+    if (props.isLoading) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <Loading />
+                </div>
+            </div>
+        );
+    }
+    else if (props.errMess) {
+        return (
+            <div className="container">
+                <div className="row">
+                    <h4>{props.errMess}</h4>
+                </div>
+            </div>
+        );
+    }
     if (props.dish != null) {
         // console.log('d: '+props.dish.description);
         return (
@@ -88,8 +98,11 @@ const DishDetails = (props) => {
                         </Card>
                     </div>
                     <div className="col-12 col-md-5 ml-1">
-                        <RenderComments comments={props.comments} />
-                        
+                        <RenderComments comments={props.comments}
+                            addComment={props.addComment}
+                            dishId={props.dish.id}
+                        />
+
                     </div>
                 </div>
             </div>
@@ -124,8 +137,7 @@ class CommentForm extends Component {
     }
 
     handleComment(values) {
-        console.log("Current state is: " + JSON.stringify(values));
-        alert("Current state is: " + JSON.stringify(values));
+        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
     }
 
     render() {
@@ -154,9 +166,9 @@ class CommentForm extends Component {
                                 <Label htmlFor="author" md={12}>Author</Label>
                                 <Col md={12}>
                                     <Control.text model=".author" id="author" className="form-control" name="author" placeholder="Your Name"
-                                     validators={{ required, minLength: minLength(3), maxLength: maxLength(15) }}
+                                        validators={{ required, minLength: minLength(3), maxLength: maxLength(15) }}
                                     />
-                                    <Errors 
+                                    <Errors
                                         className="text-danger" model=".author" show="touched"
                                         messages={{
                                             required: "This is required ",
