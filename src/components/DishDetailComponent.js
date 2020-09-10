@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbItem, Button, Col, Row, Label, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import { Control, LocalForm, Errors } from "react-redux-form";
-import { Loading } from "./LoadingComponent";
+import { Control, LocalForm, Errors } from 'react-redux-form';
+import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
+
 
 // constructor(props) {
 //     super(props);
@@ -93,7 +95,7 @@ const DishDetails = (props) => {
                 <div className="row mt-2">
                     <div className="col-12 col-md-5 ml-1">
                         <Card>
-                            <CardImg width="100%" src={props.dish.image} />
+                            <CardImg width="100%" src={baseUrl + props.dish.image} />
                             <RenderDish dish={props.dish} />
                         </Card>
                     </div>
