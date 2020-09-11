@@ -38,22 +38,20 @@ function RenderComments({ comments, postComment, dishId }) {
     if (comments != null) {
         const dishcomments = comments.map((comment) => {
             return (
-                <Stagger in>
+                <Fade in>
                     <li key={comment.id} className="list-unstyled">
-
-                        <Fade in>
-                            <p>{comment.comment}</p>
-                            <p>-- {comment.author}, {comment.date}</p>
-                        </Fade>
+                        <p>{comment.comment}</p>
+                        <p>-- {comment.author}, {comment.date}</p>
                     </li>
-                </Stagger>
+                </Fade>
             )
         })
         return (
             <div>
                 <h4>Comments</h4>
 
-                <div>{dishcomments}</div>
+                <div>
+                <Stagger in>{dishcomments}</Stagger></div>
                 <CommentForm dishId={dishId} postComment={postComment} />
             </div>
         );

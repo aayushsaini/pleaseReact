@@ -141,7 +141,7 @@ export const fetchPromos = () => (dispatch) => {
     // simulates server comm setTimeout(() => {
     //     dispatch(addDishes(DISHES));
     // }, 2000);
-}
+};
 
 export const promosLoading = () => ({
     type: ActionTypes.PROMOS_LOADING
@@ -155,4 +155,92 @@ export const promosFailed = (errmess) => ({
 export const addPromos = (promos) => ({
     type: ActionTypes.ADD_PROMOS,
     payload: promos
+});
+
+export const fetchLeads= () => (dispatch) => {
+    dispatch(leadsLoading());
+    return fetch(baseUrl + 'leaders')
+        .then(response => {
+            if (response.ok) {
+                return response;
+            } else {
+                var error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        },
+            error => {
+                var errmess = new Error(error.message);
+                throw errmess;
+            })
+        .then(response => response.json())
+        .then(leads => dispatch(addLeads(leads)))
+        .catch(error => dispatch(leadsFailed(error.message)))
+};
+
+export const leadsLoading = () => ({
+    type: ActionTypes.LEADERS_LOADING
+});
+
+export const leadsFailed = (errmess) => ({
+    type: ActionTypes.LEADERS_FAILED,
+    payload: errmess
+});
+
+export const addLeads = (leads) => ({
+    type: ActionTypes.ADD_LEADERS,
+    payload: leads
+});
+
+export const postFeedBack = (firstName,lastName,contactNo,email,feedBack) => (dispatch) => {
+    
+    dispatch(feedBackLoading());
+
+    const newFeedBack={
+        firstName: firstName,
+        lastName: lastName,
+        contactNo: contactNo,
+        email: email,
+        feedBack: feedBack
+    }
+
+    return fetch(baseUrl + 'feedback',{
+        method: 'POST',
+        headers: {
+            contentType: 'application/json'
+        },
+        body: JSON.stringify(newFeedBack)
+    })
+    .then(response => {
+        if (response.ok) {
+          return response;
+        } else {
+          var error = new Error('Error ' + response.status + ': ' + response.statusText);
+          error.response = response;
+          throw error;
+        }
+      },
+      error => {
+            var errmess = new Error(error.message);
+            throw errmess;
+      })
+    .then(response => response.json())
+    .then(feedBackData => {
+        dispatch(addFeedBack(feedBackData))
+    })
+    .catch(error => dispatch(feedBackFailed(error.message)));
+}
+
+export const feedBackLoading = () => ({
+    type: ActionTypes.FEEDBACK_LOADING
+});
+
+export const feedBackFailed = (errmess) => ({
+    type: ActionTypes.FEEDBACK_FAILED,
+    payload: errmess
+});
+
+export const addFeedBack = (feedBack) => ({
+    type: ActionTypes.ADD_FEEDBACK,
+    payload: feedBack
 });
